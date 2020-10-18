@@ -748,8 +748,6 @@ tar 命令用于对文件进行打包压缩或解压，格式为`tar [选项] [�
 [root@linuxprobe ~]# tar -czvf etc.tar.gz /etc
 tar: Removing leading '/' from member names
 /etc/
-2.8 打包压缩与搜索命令
-55
 /etc/fstab
 /etc/crypttab
 /etc/mtab
