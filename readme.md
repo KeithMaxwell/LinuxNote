@@ -1100,3 +1100,379 @@ Last login: Fri Mar 20 21:52:10 CST 2017 on pts/0
 /home/workdir
 ```
 
+# 第四章 Vim编辑器与Shell命令脚本
+
+## 4.1 Vim文本编辑器
+
+Vim 之所以能得到广大厂商与用户的认可，原因在于Vim 编辑器中设置了三种模式 — 命令模式、末行模式和编辑模式，每种模式分别又支持多种不同的命令快捷键，这大大提高了工作效率，而且用户在习惯之后也会觉得相当顺手。要想高效率地操作文本，就必须先搞清这三种模式的操作区别以及模式之间的切换方法（见图 4-1）。
+
+![](./img/Snipaste_2020-10-21_19-25-55.png)
+
+![image-20201021192631875](img/image-20201021192631875.png)
+
+图4-1 Vim 编辑器模式的切换方法
+
+在每次运行 Vim 编辑器时，默认进入命令模式，此时需要先切换到输入模式后再进行文档编写工作，而每次在编写完文档后需要先返回命令模式，然后再进入末行模式，执行文档的保存或退出操作。在 Vim 中，无法直接从输入模式切换到末行模式。Vim 编辑器中内置的命令有成百上千种用法，为了能够帮助读者更快地掌握 Vim 编辑器，表 4-1 总结了在命令模式中最常用的一些命令。
+
+![](./img/Snipaste_2020-10-21_19-27-32.png)
+
+末行模式主要用于保存或退出文件，以及设置 Vim 编辑器的工作环境，还可以让用户执行外部的 Linux 命令或跳转到所编写文档的特定行数。要想切换到末行模式，在命令模式中输入一个冒号就可以了。末行模式中可用的命令如表 4-2 所示。
+
+![](./img/Snipaste_2020-10-21_19-28-29.png)
+
+![](./img/Snipaste_2020-10-21_19-28-37.png)
+
+### 4.1.1 编写简单文档
+
+编写脚本文档的第 1 步就是给文档取个名字，这里将其命名为 practice.txt。如果存着该文档，则是打开它。如果不存在，则是创建一个临时的输入文件，如图 4-2 所示。
+
+![image-20201021193614268](img/image-20201021193614268.png)
+
+图 4-2 尝试编写脚本文档
+
+打开 practice.txt 文档后，默认进入的是 Vim 编辑器的命令模式。此时只能执行该模式下的命令，而不能随意输入文本内容，我们需要切换到输入模式才可以编写文档。在图 4-1 中提到，可以分别使用 a、i、o 三个键从命令模式切换到输入模式。其中，a 键与 i 键分别是在光标后面一位和光标当前位置切换到输入模式，而 o 键则是在光标的下面再创建一个空行，此时可敲击 a 键进入到编辑器的输入模式，如图 4-3 所示。进入输入模式后，可以随意输入文本内容，Vim 编辑器不会把您输入的文本内容当作命令而执行，如图 4-4 所示。
+
+![image-20201021193727905](img/image-20201021193727905.png)
+
+图 4-3 切换至编辑器的输入模式
+
+![image-20201021193739520](img/image-20201021193739520.png)
+
+图 4-4 在编辑器中输入文本内容
+
+![image-20201021193751446](img/image-20201021193751446.png)
+
+图 4-5 Vim 编辑器的命令模式
+
+在编写完之后，想要保存并退出，必须先敲击键盘 Esc 键从输入模式返回命令模式，如图 4-5 所示。然后再输入:wq!切换到末行模式才能完成保存退出操作，如图 4-6 所示。
+
+![image-20201021193808777](img/image-20201021193808777.png)
+
+图 4-6 Vim 编辑器的末行模式
+
+### 4.1.2 配置主机名称
+
+为了便于在局域网中查找某台特定的主机，或者对主机进行区分，除了要有 IP 地址外，还要为主机配置一个主机名，主机之间可以通过这个类似于域名的名称来相互访问。在 Linux系统中，主机名大多保存在/etc/hostname 文件中，接下来将/etc/hostname 文件的内容修改为“linuxprobe.com”，步骤如下。
+
+1. 使用 Vim 编辑器修改“/etc/hostname”主机名称文件。
+2. 把原始主机名称删除后追加“linuxprobe.com”。注意，使用 Vim 编辑器修改主机名称文件后，要在末行模式下执行:wq!命令才能保存并退出文档。
+3. 保存并退出文档，然后使用 hostname 命令检查是否修改成功。
+
+```shell
+[root@linuxprobe ~]# vim /etc/hostname
+linuxprobe.com
+```
+
+hostname 命令用于查看当前的主机名称，但有时主机名称的改变不会立即同步到系统中，所以如果发现修改完成后还显示原来的主机名称，可重启虚拟机后再行查看：
+
+```shell
+[root@linuxprobe ~]# hostname
+linuxprobe.com
+```
+
+### 4.1.3 配置网卡信息
+
+网卡 IP 地址配置的是否正确是两台服务器是否可以相互通信的前提。在 Linux 系统中，一切都是文件，因此配置网络服务的工作其实就是在编辑网卡配置文件，因此这个小任务不仅可以帮助您练习使用 Vim 编辑器，而且也为您后面学习 Linux 中的各种服务配置打下了坚实的基础。
+
+如果您具备一定的运维经验或者熟悉早期的 Linux 系统，则在学习本书时会遇到一些不容易接受的差异变化。在 RHEL 5、RHEL 6 中，网卡配置文件的前缀为 eth，第 1 块网卡为eth0，第 2 块网卡为 eth1；以此类推。而在 RHEL 7 中，网卡配置文件的前缀则以 ifcfg 开始，加上网卡名称共同组成了网卡配置文件的名字，例如 ifcfg-eno16777736；好在除了文件名变化外也没有其他大的区别。
+
+现在有一个名称为 ifcfg-eno16777736 的网卡设备，我们将其配置为开机自启动，并且 IP地址、子网、网关等信息由人工指定，其步骤应该如下所示。
+
+1. 首先切换到/etc/sysconfig/network-scripts 目录中（存放着网卡的配置文件）。
+2. 使用 Vim 编辑器修改网卡文件 ifcfg-eno16777736，逐项写入下面的配置参数并保存退出。由于每台设备的硬件及架构是不一样的，因此请读者使用 ifconfig 命令自行确认各自网卡的默认名称。
+   * 设备类型：TYPE=Ethernet
+   * 地址分配模式：BOOTPROTO=static
+   * 网卡名称：NAME=eno16777736
+   * 是否启动：ONBOOT=yes
+   * IP 地址：IPADDR=192.168.10.10
+   * 子网掩码：NETMASK=255.255.255.0
+   * 网关地址：GATEWAY=192.168.10.1
+   * DNS 地址：DNS1=192.168.10.1
+3. 重启网络服务并测试网络是否联通。
+
+进入到网卡配置文件所在的目录，然后编辑网卡配置文件，在其中填入下面的信息：
+
+```shell
+[root@linuxprobe ~]# cd /etc/sysconfig/network-scripts/
+[root@linuxprobe network-scripts]# vim ifcfg-eno16777736
+TYPE=Ethernet
+BOOTPROTO=static
+NAME=eno16777736
+ONBOOT=yes
+IPADDR=192.168.10.10
+NETMASK=255.255.255.0
+GATEWAY=192.168.10.1
+DNS1=192.168.10.1
+```
+
+执行重启网卡设备的命令（在正常情况下不会有提示信息），然后通过ping 命令测试网络能否联通。由于在Linux 系统中ping 命令不会自动终止，因此需要手动按下Ctrl-c 键来强行结束进程。
+
+```shell
+[root@linuxprobe network-scripts]# systemctl restart network
+[root@linuxprobe network-scripts]# ping 192.168.10.10
+PING 192.168.10.10 (192.168.10.10) 56(84) bytes of data.
+64 bytes from 192.168.10.10: icmp_seq=1 ttl=64 time=0.081 ms
+64 bytes from 192.168.10.10: icmp_seq=2 ttl=64 time=0.083 ms
+64 bytes from 192.168.10.10: icmp_seq=3 ttl=64 time=0.059 ms
+64 bytes from 192.168.10.10: icmp_seq=4 ttl=64 time=0.097 ms
+^C
+--- 192.168.10.10 ping statistics ---
+4 packets transmitted, 4 received, 0% packet loss, time 2999ms
+rtt min/avg/max/mdev = 0.059/0.080/0.097/0.013 ms
+```
+
+### 4.1.4 配置Yum软件仓库
+
+本书前面讲到，Yum 软件仓库的作用是为了进一步简化RPM 管理软件的难度以及自动分析所需软件包及其依赖关系的技术。可以把Yum 想象成是一个硕大的软件仓库，里面保存有几乎所有常用的工具，而且只需要说出所需的软件包名称，系统就会自动为您搞定一切。
+
+既然要使用 Yum 软件仓库，就要先把它搭建起来，然后将其配置规则确定好才行。鉴于第 6 章才会讲解 Linux 的存储结构和设备挂载操作，所以我们当前还是将重心放到 Vim 编辑器的学习上。如果遇到看不懂的参数也不要紧，后面章节会单独讲解。搭建并配置 Yum 软件仓库的大致步骤如下所示。
+
+1. 进入到/etc/yum.repos.d/目录中（因为该目录存放着Yum软件仓库的配置文件）。
+2. 使用 Vim 编辑器创建一个名为 rhel7.repo 的新配置文件（文件名称可随意，但后缀必须为.repo），逐项写入下面加粗的配置参数并保存退出（不要写后面的中文注释）。
+   * [rhel-media] ：Yum 软件仓库唯一标识符，避免与其他仓库冲突。
+   * name=linuxprobe：Yum 软件仓库的名称描述，易于识别仓库用处。
+   * baseurl=file:///media/cdrom：提供的方式包括 FTP（ftp://..）、HTTP（http://..）、本地（file:///..）。
+   * enabled=1：设置此源是否可用；1 为可用，0 为禁用。
+   * gpgcheck=1：设置此源是否校验文件；1 为校验，0 为不校验。
+   * gpgkey=file:///media/cdrom/RPM-GPG-KEY-redhat-release：若上面参数开启校验，那么请指定公钥文件地址。
+3. 按配置参数的路径挂载光盘，并把光盘挂载信息写入到/etc/fstab 文件中。
+4. 使用“yum install httpd -y”命令检查 Yum 软件仓库是否已经可用。
+
+进入/etc/yum.repos.d 目录中后创建 Yum 配置文件：
+
+```shell
+[root@linuxprobe ~]# cd /etc/yum.repos.d/
+[root@linuxprobe yum.repos.d]# vim rhel7.repo
+[rhel7]
+name=rhel7
+baseurl=file:///media/cdrom
+enabled=1
+gpgcheck=0
+```
+
+创建挂载点后进行挂载操作，并设置成开机自动挂载（详见第 6 章）。尝试使用 Yum 软件仓库来安装 Web 服务，出现 Complete！则代表配置正确：
+
+```shell
+[root@linuxprobe yum.repos.d]# mkdir -p /media/cdrom
+[root@linuxprobe yum.repos.d]# mount /dev/cdrom /media/cdrom
+mount: /dev/sr0 is write-protected, mounting read-only
+[root@linuxprobe yum.repos.d]# vim /etc/fstab
+/dev/cdrom /media/cdrom iso9660 defaults 0 0
+[root@linuxprobe ~]# yum install httpd
+Loaded plugins: langpacks, product-id, subscription-manager
+………………省略部分输出信息………………
+Dependencies Resolved
+===============================================================================
+Package Arch Version Repository Size
+===============================================================================
+Installing:
+httpd x86_64 2.4.6-17.el7 rhel 1.2 M
+Installing for dependencies:
+apr x86_64 1.4.8-3.el7 rhel 103 k
+apr-util x86_64 1.5.2-6.el7 rhel 92 k
+httpd-tools x86_64 2.4.6-17.el7 rhel 77 k
+mailcap noarch 2.1.41-2.el7 rhel 31 k
+Transaction Summary
+===============================================================================
+Install 1 Package (+4 Dependent packages)
+Total download size: 1.5 M
+Installed size: 4.3 M
+Is this ok [y/d/N]: y
+Downloading packages:
+-------------------------------------------------------------------------------
+………………省略部分输出信息………………
+Complete!
+```
+
+## 4.2 编写Shell脚本
+
+可以将 Shell 终端解释器当作人与计算机硬件之间的“翻译官”，**它作为用户与 Linux 系统内部的通信媒介，除了能够支持各种变量与参数外，还提供了诸如循环、分支等高级编程语言才有的控制结构特性。**要想正确使用 Shell 中的这些功能特性，准确下达命令尤为重要。Shell 脚本命令的工作方式有两种：**交互式和批处理。**
+
+* 交互式（Interactive）：用户每输入一条命令就立即执行。
+* 批处理（Batch）：由用户事先编写好一个完整的 Shell 脚本，Shell 会一次性执行脚本中诸多的命令。
+
+在 Shell 脚本中不仅会用到前面学习过的很多 Linux 命令以及正则表达式、管道符、数据流重定向等语法规则，还需要把内部功能模块化后通过逻辑语句进行处理，最终形成日常所见的 Shell 脚本。
+
+查看 SHELL 变量可以发现当前系统已经默认使用 Bash 作为命令行终端解释器了：
+
+```shell
+[root@linuxprobe ~]# echo $SHELL
+/bin/bash
+```
+
+### 4.2.1 编写简单的脚本
+
+其实使用 Vim 编辑器把 Linux 命令按照顺序依次写入到一个文件中，这就是一个简单的脚本了。
+
+例如，如果想查看当前所在工作路径并列出当前目录下所有的文件及属性信息，实现这个功能的脚本应该类似于下面这样：
+
+```shell
+[root@linuxprobe ~]# vim example.sh
+#!/bin/bash
+#For Example BY linuxprobe.com
+pwd
+ls -al
+```
+
+Shell 脚本文件的名称可以任意，但为了避免被误以为是普通文件，建议将.sh 后缀加上，以表示是一个脚本文件。在上面的这个 example.sh 脚本中实际上出现了三种不同的元素：第一行的脚本声明（#!）用来告诉系统使用哪种 Shell 解释器来执行该脚本；第二行的注释信息（#）是对脚本功能和某些命令的介绍信息，使得自己或他人在日后看到这个脚本内容时，可以快速知道该脚本的作用或一些警告信息；第三、四行的可执行语句也就是我们平时执行的 Linux 命令了。什么？！你们不相信这么简单就编写出来了一个脚本程序，那我们来执行一下看看结果：
+
+```shell
+[root@linuxprobe ~]# bash example.sh
+/root/Desktop
+total 8
+drwxr-xr-x. 2 root root 23 Jul 23 17:31 .
+dr-xr-x---. 14 root root 4096 Jul 23 17:31 ..
+-rwxr--r--. 1 root root 55 Jul 23 17:31 example.sh
+```
+
+除了上面用 bash 解释器命令直接运行 Shell 脚本文件外，第二种运行脚本程序的方法是通过输入完整路径的方式来执行。但默认会因为权限不足而提示报错信息，此时只需要为脚本文件增加执行权限即可（详见第 5 章）。初次学习 Linux 系统的读者不用心急，等下一章学完用户身份和权限后再来做这个实验也不迟：
+
+```shell
+[root@linuxprobe ~]# ./example.sh
+bash: ./Example.sh: Permission denied
+[root@linuxprobe ~]# chmod u+x example.sh
+[root@linuxprobe ~]# ./example.sh
+/root/Desktop
+total 8
+drwxr-xr-x. 2 root root 23 Jul 23 17:31 .
+dr-xr-x---. 14 root root 4096 Jul 23 17:31 ..
+-rwxr--r--. 1 root root 55 Jul 23 17:31 example.sh
+```
+
+### 4.2.2 接收用户的参数
+
+但是，像上面这样的脚本程序只能执行一些预先定义好的功能，未免太过死板了。为了让 Shell 脚本程序更好地满足用户的一些实时需求，以便灵活完成工作，必须要让脚本程序能够像之前执行命令时那样，接收用户输入的参数。
+
+其实，Linux 系统中的 Shell 脚本语言早就考虑到了这些，已经内设了用于接收参数的变量，变量之间可以使用空格间隔。例如`$0` 对应的是当前 Shell 脚本程序的名称，`$#`对应的是总共有几个参数，`$*`对应的是所有位置的参数值，`$?`对应的是显示上一次命令的执行返回值，而`$1`、`$2`、`$3`……则分别对应着第 N 个位置的参数值，如图 4-15 所示。
+
+![image-20201024200744010](img/image-20201024200744010.png)
+
+理论过后我们来练习一下。尝试编写一个脚本程序示例，通过引用上面的变量参数来看下真实效果：
+
+```shell
+[root@linuxprobe ~]# vim example.sh
+#!/bin/bash
+echo "当前脚本名称为$0"
+echo "总共有$#个参数，分别是$*。"
+echo "第 1 个参数为$1，第 5 个为$5。"
+[root@linuxprobe ~]# sh example.sh one two three four five six
+当前脚本名称为 example.sh
+总共有 6 个参数，分别是 one two three four five six。
+第 1 个参数为 one，第 5 个为 five。
+```
+
+### 4.2.3 判断用户的参数
+
+在本书前面章节中讲到，系统在执行 mkdir 命令时会判断用户输入的信息，即判断用户指定的文件夹名称是否已经存在，如果存在则提示报错；反之则自动创建。Shell 脚本中的条件测试语法可以判断表达式是否成立，若条件成立则返回数字 0，否则便返回其他随机数值。条件测试语法的执行格式如图 4-16 所示。切记，条件表达式两边均应有一个空格。
+
+![image-20201024204453603](img/image-20201024204453603.png)
+
+图 4-16 条件测试语句的执行格式
+
+按照测试对象来划分，条件测试语句可以分为 4 种：
+
+* 文件测试语句；
+* 逻辑测试语句
+* 整数值比较语句
+* 字符串比较语句
+
+文件测试即使用指定条件来判断文件是否存在或权限是否满足等情况的运算符，具体的参数如表 4-3 所示。
+
+![](./img/Snipaste_2020-10-24_20-45-58.png)
+
+下面使用文件测试语句来判断/etc/fstab 是否为一个目录类型的文件，然后通过 Shell 解释器的内设$?变量显示上一条命令执行后的返回值。如果返回值为 0，则目录存在；如果返回值为非零的值，则意味着目录不存在：
+
+```shell
+[root@linuxprobe ~]# [ -d /etc/fstab ]
+[root@linuxprobe ~]# echo $?
+1
+```
+
+再使用文件测试语句来判断/etc/fstab 是否为一般文件，如果返回值为 0，则代表文件存在，且为一般文件：
+
+```shell
+[root@linuxprobe ~]# [ -f /etc/fstab ]
+[root@linuxprobe ~]# echo $?
+0
+```
+
+逻辑语句用于对测试结果进行逻辑分析，根据测试结果可实现不同的效果。例如在 Shell终端中逻辑“与”的运算符号是`&&`，它表示当前面的命令执行成功后才会执行它后面的命令，因此可以用来判断/dev/cdrom 文件是否存在，若存在则输出 Exist 字样。
+
+```shell
+[root@linuxprobe ~]# [ -e /dev/cdrom ] && echo "Exist"
+Exist
+```
+
+除了逻辑“与”外，还有逻辑“或”，它在 Linux 系统中的运算符号为`||`，表示当前面的命令执行失败后才会执行它后面的命令，因此可以用来结合系统环境变量 `USER` 来判断当前登录的用户是否为非管理员身份：
+
+```shell
+[root@linuxprobe ~]# echo $USER
+root
+[root@linuxprobe ~]# [ $USER = root ] || echo "user"
+[root@linuxprobe ~]# su - linuxprobe
+[linuxprobe@linuxprobe ~]$ [ $USER = root ] || echo "user"
+user
+```
+
+第三种逻辑语句是“非”，在 Linux 系统中的运算符号是一个叹号（！），它表示把条件测试中的判断结果取相反值。也就是说，如果原本测试的结果是正确的，则将其变成错误的；原本测试错误的结果则将其变成正确的。
+
+整数比较运算符仅是对数字的操作，不能将数字与字符串、文件等内容一起操作，而且不能想当然地使用日常生活中的等号、大于号、小于号等来判断。因为等号与赋值命令符冲突，大于号和小于号分别与输出重定向命令符和输入重定向命令符冲突。因此一定要使用规范的整数比较运算符来进行操作。可用的整数比较运算符如表 4-4 所示。
+
+![](./img/Snipaste_2020-10-24_20-55-02.png)
+
+接下来小试牛刀。我们先测试一下 10 是否大于 10 以及 10 是否等于 10（通过输出的返回值内容来判断）：
+
+```shell
+[root@linuxprobe ~]# [ 10 -gt 10 ]
+[root@linuxprobe ~]# echo $?
+1
+[root@linuxprobe ~]# [ 10 -eq 10 ]
+[root@linuxprobe ~]# echo $?
+0
+```
+
+在 2.4 节曾经讲过 free 命令，它可以用来获取当前系统正在使用及可用的内存量信息。接下来先使用 free -m 命令查看内存使用量情况（单位为 MB），然后通过 grep Mem:命令过滤出剩余内存量的行，再用 `awk '{print $4}'`命令只保留第四列，最后用FreeMem=\`语句\`的方式把语句内执行的结果赋值给变量。这个演示确实有些难度，但看懂后会觉得很有意思，没准在运维工作中也会用得上。
+
+```shell
+[root@linuxprobe ~]# free -m
+total used free shared buffers cached
+Mem: 1826 1244 582 9 1 413
+-/+ buffers/cache: 830 996
+Swap: 2047 0 2047
+[root@linuxprobe ~]# free -m | grep Mem:
+Mem: 1826 1244 582 9
+[root@linuxprobe ~]# free -m | grep Mem: | awk '{print $4}'
+582
+[root@linuxprobe ~]# FreeMem=`free -m | grep Mem: | awk '{print $4}'`
+[root@linuxprobe ~]# echo $FreeMem
+582
+```
+
+上面用于获取内存可用量的命令以及步骤可能有些“超纲”了，如果不能理解领会也不用担心，接下来才是重点。我们使用整数运算符来判断内存可用量的值是否小于 1024，若小于则会提示“Insufficient Memory”（内存不足）的字样：
+
+```shell
+[root@linuxprobe ~]# [ $FreeMem -lt 1024 ] && echo "Insufficient Memory"
+Insufficient Memory
+```
+
+字符串比较语句用于判断测试字符串是否为空值，或两个字符串是否相同。它经常用来判断某个变量是否未被定义（即内容为空值），理解起来也比较简单。字符串比较中常见的运算符如表 4-5 所示。
+
+![](./img/Snipaste_2020-10-24_21-03-18.png)
+
+接下来通过判断 String 变量是否为空值，进而判断是否定义了这个变量：
+
+```shell
+[root@linuxprobe ~]# [ -z $String]
+[root@linuxprobe ~]# echo $?
+0
+```
+
+再尝试引入逻辑运算符来试一下。当用于保存当前语系的环境变量值 LANG 不是英语（en.US）时，则会满足逻辑测试条件并输出“Not en.US”（非英语）的字样：
+
+```shell
+[root@linuxprobe ~]# echo $LANG
+en_US.UTF-8
+[root@linuxprobe ~]# [ $LANG != "en.US" ] && echo "Not en.US"
+Not en.US
+```
+
